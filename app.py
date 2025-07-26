@@ -54,6 +54,12 @@ def recommend_ml(mood, last_watched, genres, top_k):
     df_filtered['similarity'] = similarity_series.loc[df_filtered.index]
     df_filtered = df_filtered.sort_values("similarity", ascending=False)
 
+    if df_filtered.empty:
+        fallback = df.copy()
+        fallback['similarity'] = similarity_series
+        fallback = fallback.sort_values("similarity", ascending=False)
+        return fallback.head(top_k)
+
     return df_filtered.head(top_k)
 
 if st.button("🎬 Recommend!"):
@@ -61,6 +67,9 @@ if st.button("🎬 Recommend!"):
         st.warning("Please select at least one genre.")
     else:
         results = recommend_ml(mood, last_watched, selected_genres, top_k)
+        if results.empty:
+            st.info("No exact matches found. Showing top picks instead.")
+            results = df.sort_values("score", ascending=False).head(top_k)
         try:
             st.success(f"Top {top_k} Recommendations:")
             st.dataframe(
