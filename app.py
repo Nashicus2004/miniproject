@@ -41,17 +41,18 @@ def recommend_ml(mood, last_watched, genres, top_k):
         mood_mask = df_filtered['description'].str.contains(mood, case=False)
         df_filtered = df_filtered[mood_mask]
 
+    similarity_series = pd.Series(0, index=df.index)
+
     if last_watched:
         idx = df[df['title'] == last_watched].index
         if not idx.empty:
             idx = idx[0]
             cosine_sim = cosine_similarity(tfidf_matrix[idx], tfidf_matrix).flatten()
-            df_filtered['similarity'] = cosine_sim
-            df_filtered = df_filtered.sort_values("similarity", ascending=False)
-        else:
-            df_filtered['similarity'] = 0
-    else:
-        df_filtered['similarity'] = 0
+            similarity_series = pd.Series(cosine_sim, index=df.index)
+
+    df_filtered = df_filtered.copy()
+    df_filtered['similarity'] = similarity_series.loc[df_filtered.index]
+    df_filtered = df_filtered.sort_values("similarity", ascending=False)
 
     return df_filtered.head(top_k)
 
