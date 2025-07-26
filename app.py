@@ -28,7 +28,7 @@ mood_options = [
     "Tragic", "Philosophical", "Suspenseful", "Feel-good", "Thrilling", "Drama"
 ]
 
-st.title("🎥 ML-powered Anime & Movie Recommender")
+st.title("Mood Based Anime & Movie Recommender")
 
 # UI Inputs
 mood = st.selectbox("Mood", mood_options)
